@@ -21,7 +21,7 @@ class {{ $migrationName }}
     public static function run()
     {
         if ($block = $this->blockRepository->getById('{{ $block['identifier'] }}')) {
-
+            
         }
     }
 }
