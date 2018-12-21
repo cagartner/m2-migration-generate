@@ -22,6 +22,9 @@
 namespace Cagartner\GenerateMigration\Console\Command;
 
 use Cagartner\GenerateMigration\Model\Config;
+use Cagartner\GenerateMigration\Model\GenerateBlock;
+use Cagartner\GenerateMigration\Model\GenerateFile;
+use Magento\Cms\Model\BlockRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -31,8 +34,22 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Block extends Command
 {
 
-    const NAME_ARGUMENT = "name";
-    const IDENTIFIER_ARGUMENT = "identifier";
+    const NAME_ARGUMENT = 'name';
+    const IDENTIFIER_ARGUMENT = 'identifier';
+    const DEFAULT_MIGRATION_NAME = 'block_migration_';
+
+    protected $blockRepository;
+    protected $blockFile;
+
+    public function __construct(
+        BlockRepository $blockRepository,
+        GenerateBlock $generateBlock
+    )
+    {
+        $this->blockRepository = $blockRepository;
+        $this->blockFile = $generateBlock;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -45,12 +62,16 @@ class Block extends Command
         $identifier = $input->getArgument(self::IDENTIFIER_ARGUMENT);
 
         try {
+            $block = $this->blockRepository->getById($identifier)->getData();
 
+            $this->blockFile->setMigrationName($name ?: self::DEFAULT_MIGRATION_NAME . '_' . time());
+            $this->blockFile->setNamespace(Config::MIGRATION_PATH);
+            $this->blockFile->generate(GenerateFile::TYPE_BLOCK, compact('block'));
+
+            $output->writeln("New block created in: " .  $this->blockFile->output());
         } catch (\Exception $e) {
-
+            $output->writeln("Error in generate file " . $e->getMessage());
         }
-
-        $output->writeln("Hello " . $name);
     }
 
     /**

@@ -11,7 +11,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "jenssegers/blade": "~1.*"
+        "jenssegers/blade": "^1.1"
     },
     "autoload": {
         "psr-4": {

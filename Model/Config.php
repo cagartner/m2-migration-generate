@@ -15,6 +15,8 @@ namespace Cagartner\GenerateMigration\Model;
  */
 abstract class Config
 {
+    const MODULE_NAME = 'Cagartner_GenerateMigration';
+
     /**
      *
      */
