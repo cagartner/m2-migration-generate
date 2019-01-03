@@ -62,9 +62,9 @@ class Block extends Command
         $identifier = $input->getArgument(self::IDENTIFIER_ARGUMENT);
 
         try {
-            $block = $this->blockRepository->getById($identifier)->getData();
-
-            $this->blockFile->setMigrationName($name ?: self::DEFAULT_MIGRATION_NAME . '_' . time());
+            /** @var \Magento\Cms\Model\Block $block */
+            $block = $this->blockRepository->getById($identifier);
+            $this->blockFile->setMigrationName($name ?: self::DEFAULT_MIGRATION_NAME . '_' . date('Ymdhis'));
             $this->blockFile->setNamespace(Config::MIGRATION_PATH);
             $this->blockFile->generate(GenerateFile::TYPE_BLOCK, compact('block'));
 
