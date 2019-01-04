@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
 	<system>
-		<tab id="Cagartner" sortOrder="999" translate="label">
-			<label>Cagartner</label>
+		<tab id="cagartner" sortOrder="999" translate="label">
+			<label>CaGartner</label>
 		</tab>
-		<section id="Cagartner" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
-			<label>Cagartner</label>
-			<tab>Cagartner</tab>
-			<resource>Cagartner_GenerateMigration::config_Cagartner_generatemigration</resource>
+		<section id="cagartner" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+			<label>Migration Generator</label>
+			<tab>cagartner</tab>
+			<resource>Cagartner_GenerateMigration::config_cagartner_generatemigration</resource>
 			<group id="generation_migration" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
 				<label>Migration Generation</label>
-				<field id="output_path" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">
-					<label>output_path</label>
-                    <comment>Path in your code for generate the php script</comment>
+				<field id="module_path" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">
+					<label>Module Path</label>
+					<comment>Path in your code for generate the php script (Run bin/magento make:migration:init to fill this option)</comment>
 				</field>
 			</group>
 		</section>

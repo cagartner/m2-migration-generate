@@ -8,40 +8,91 @@
 
 namespace Cagartner\GenerateMigration\Model;
 
-
+use Cagartner\GenerateMigration\Helper\Data as MigrationHelper;
 use Jenssegers\Blade\Blade;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Module\Dir\Reader;
 
+/**
+ * Class GenerateFile
+ * @package Cagartner\GenerateMigration\Model
+ */
 class GenerateFile
 {
+    /**
+     * Type block
+     */
     const TYPE_BLOCK = 'block';
+    /**
+     *
+     */
     const TYPE_PAGE = 'page';
+    /**
+     *
+     */
     const TYPE_CONFIG = 'config';
+    /**
+     *
+     */
     const TYPE_EMAIL = 'email';
 
-    protected $moduleReader;
-    protected $moduleDir;
-    protected $directoryList;
-    protected $filesystem;
-    protected $namespace;
-    protected $migrationName;
-    protected $io;
+    const NO_MIGRATE_MODULE = 'Migration Module not configured, please run: bin/magento make:migration:init <Vendor> <Name>';
 
+    /**
+     * @var Reader
+     */
+    protected $moduleReader;
+    /**
+     * @var
+     */
+    protected $moduleDir;
+    /**
+     * @var DirectoryList
+     */
+    protected $directoryList;
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+    /**
+     * @var
+     */
+    protected $namespace;
+    /**
+     * @var File
+     */
+    protected $io;
+    /**
+     * @var Blade
+     */
+    protected $blade;
+
+    protected $helper;
+
+    /**
+     * GenerateFile constructor.
+     * @param Reader $moduleReader
+     * @param DirectoryList $directoryList
+     * @param Filesystem $filesystem
+     * @param File $io
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
     public function __construct(
         Reader $moduleReader,
         DirectoryList $directoryList,
         Filesystem $filesystem,
-        File $io
+        File $io,
+        MigrationHelper $helper
     )
     {
         $this->moduleReader = $moduleReader;
         $this->directoryList = $directoryList;
         $this->filesystem = $filesystem;
         $this->io = $io;
-        $this->setModuleDir();
+        $this->helper = $helper;
+        $this->initiate();
     }
 
     /**
@@ -52,6 +103,9 @@ class GenerateFile
         return $this->moduleDir;
     }
 
+    /**
+     *
+     */
     public function setModuleDir(): void
     {
         $viewDir = $this->moduleReader->getModuleDir(
@@ -78,58 +132,41 @@ class GenerateFile
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getMigrationName()
+    public function getTemplateDir()
     {
-        return $this->migrationName;
+        return $this->getModuleDir() . 'Templates';
     }
 
     /**
-     * @param mixed $migrationName
+     * @return string
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
-    public function setMigrationName($migrationName): void
-    {
-        $this->migrationName = $migrationName;
-    }
-
-    public function getTemplateDir()
-    {
-        return $this->moduleDir . 'Templates';
-    }
-
     public function getCacheDir()
     {
         return $this->directoryList->getPath(DirectoryList::CACHE);
     }
 
+    /**
+     * @return mixed
+     * @throws \Exception
+     */
     public function getOutputDir()
     {
-        return $this->directoryList->getPath(DirectoryList::VAR_DIR) . '/migration/';
+        if ($outputDir = $this->helper->getMigrationModuleDir()) {
+            return $outputDir . 'Setup/migrations';
+        }
+        throw new \Exception(self::NO_MIGRATE_MODULE);
     }
 
-    public function output()
+    /**
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
+    protected function initiate()
     {
-        return '/path/of/output';
-    }
-
-    public function generate($type=self::TYPE_BLOCK, $data = [])
-    {
+        $this->setModuleDir();
         $this->io->checkAndCreateFolder($this->getCacheDir());
-        $this->io->checkAndCreateFolder($this->getOutputDir());
-
-        $blade = new Blade($this->getTemplateDir(), $this->getCacheDir());
-
-        $fileData =  [
-            'namespace' => $this->getNamespace(),
-            'migrationName' => $this->getMigrationName(),
-            'namespace' => $this->getNamespace()
-        ];
-
-        $fileContent = $blade->render($type, array_merge($fileData, $data));
-        $fileName = $this->getMigrationName() . '.php';
-
-        $this->io->open(['path' => $this->getOutputDir()]);
-        return $this->io->write($fileName, $fileContent, 0666);
+        $this->blade = new Blade($this->getTemplateDir(), $this->getCacheDir());
     }
 }

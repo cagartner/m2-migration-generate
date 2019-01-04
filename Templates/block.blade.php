@@ -7,8 +7,10 @@ use Magento\Cms\Model\BlockFactory;
 
 /**
 * Copy this class to your  migration module and put this line to your migration
-* $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-* $objectManager->create(Your\Migration\{{ $migrationName}}::class)->run();
+
+  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+  $objectManager->create(\{{ $namespace }}\{{ $migrationName}}::class)->run();
+
 */
 class {{ $migrationName }}
 {
@@ -24,7 +26,7 @@ class {{ $migrationName }}
         $this->blockFactory = $blockFactory;
     }
 
-    public static function run()
+    public function run()
     {
         /** @var \Magento\Cms\Model\Block $block */
         $block = $this->blockRepository->getById({{ var_export($block->getIdentifier()) }});
@@ -32,16 +34,14 @@ class {{ $migrationName }}
         if (!$block->getId()) {
             // If not exist, create a new block
             $block = $this->blockFactory->create();
+            $block->setIdentifier({{ var_export($block->getIdentifier()) }});
         }
-        <?php
-            $data = $block->getData();
-            // Remove not important data
-            unset($data['block_id']);
-            unset($data['creation_time']);
-            unset($data['update_time']);
-            unset($data['stores']);
-        ?>
-        $block->setData({{ var_export($data) }});
+
+        $block->setTitle({{ var_export($block->getTitle()) }});
+        $block->setContent({{ var_export($block->getContent()) }});
+        $block->setIsActive({{ (boolean) $block->getData('is_active') }});
+        $block->setStoreId({{ var_export($block->getData('store_id')) }});
+
         return $this->blockRepository->save($block);
     }
 }

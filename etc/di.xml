@@ -7,6 +7,7 @@
 				<item name="page" xsi:type="object">Cagartner\GenerateMigration\Console\Command\Page</item>
 				<item name="config" xsi:type="object">Cagartner\GenerateMigration\Console\Command\Config</item>
 				<item name="email" xsi:type="object">Cagartner\GenerateMigration\Console\Command\Email</item>
+				<item name="init" xsi:type="object">Cagartner\GenerateMigration\Console\Command\Init</item>
 			</argument>
 		</arguments>
 	</type>

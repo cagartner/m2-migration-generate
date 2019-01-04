@@ -21,6 +21,7 @@ abstract class Config
      *
      */
     const NAMESPACE = 'make:migration';
+
     /**
      *
      */

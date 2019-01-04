@@ -8,10 +8,30 @@ In your console execute the following commands, the output class file will be in
 
 Copy your generated class and put in your migration module.
 
-You can call your migrations in your Setup/installData.php or Setup/upgradeData.php with this code:
+### Setup Migration:
 
-    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-    $objectManager->create(Your\Module\Setup\migrationName::class)->run();
+Before create any migration your need to setup de migration module, for this run:
+
+    bin/magento make:migration:init <Vendor> <NameofModule>
+    # Exemple
+    bin/magento make:migration:init Cagartner Migration
+
+This command will create a new module in app/code folder of magento structure.
+
+    app
+    |-- code
+        |-- Cagartner
+            |-- Migration
+                |-- etc
+                    -- module.xml
+                |-- Setup
+                    |-- migrations
+                    |-- InstallData.php
+                    |-- UpgradeData.php
+                |-- composer.json
+                |-- registration.php
+                
+Every migration that you create will be generated into migrations folder in that module
 
 ### Blocks:
     bin/magento make:migration:block {indentifier} {nameOfMigration}

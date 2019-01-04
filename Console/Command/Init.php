@@ -21,32 +21,26 @@
 
 namespace Cagartner\GenerateMigration\Console\Command;
 
-use Cagartner\GenerateMigration\Model\Config;
-use Cagartner\GenerateMigration\Model\GenerateBlock;
-use Magento\Cms\Model\BlockRepository;
+use Cagartner\GenerateMigration\Model\Config as ConfigSet;
+use Cagartner\GenerateMigration\Model\GenerateModule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Block extends Command
+class Init extends Command
 {
+    const NAME_ARGUMENT = "name";
+    const VENDOR_ARGUMENT = "vendor";
 
-    const NAME_ARGUMENT = 'name';
-    const IDENTIFIER_ARGUMENT = 'identifier';
-    const DEFAULT_MIGRATION_NAME = 'block_migration_';
-
-    protected $blockRepository;
-    protected $blockFile;
+    protected $generateModule;
 
     public function __construct(
-        BlockRepository $blockRepository,
-        GenerateBlock $generateBlock
+        GenerateModule $generateModule
     )
     {
-        $this->blockRepository = $blockRepository;
-        $this->blockFile = $generateBlock;
+        $this->generateModule = $generateModule;
         parent::__construct();
     }
 
@@ -57,18 +51,17 @@ class Block extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
+        $vendor = $input->getArgument(self::VENDOR_ARGUMENT);
         $name = $input->getArgument(self::NAME_ARGUMENT);
-        $identifier = $input->getArgument(self::IDENTIFIER_ARGUMENT);
+
+        $this->generateModule->setName($name);
+        $this->generateModule->setVendor($vendor);
 
         try {
-            /** @var \Magento\Cms\Model\Block $block */
-            $block = $this->blockRepository->getById($identifier);
-            $this->blockFile->setMigrationName($name);
-            $this->blockFile->generate(compact('block'));
-
-            $output->writeln("New block migration created in: " . $this->blockFile->getOutputDir() . 'Setup/migrations/' . $name . '.php');
+            $this->generateModule->generate();
+            $output->writeln('Created a New Migrate Module, run "bin/magento setup:upgrade" for activate the new module');
         } catch (\Exception $e) {
-            $output->writeln("Error in generate file: " . $e->getMessage());
+            $output->writeln("Error in generate file " . $e->getMessage());
         }
     }
 
@@ -77,11 +70,11 @@ class Block extends Command
      */
     protected function configure()
     {
-        $this->setName(Config::NAMESPACE . ":block");
-        $this->setDescription("Generate Block Migration");
+        $this->setName(ConfigSet::NAMESPACE . ":init");
+        $this->setDescription("Initial configuration to create migration module");
         $this->setDefinition([
-            new InputArgument(self::IDENTIFIER_ARGUMENT, InputArgument::REQUIRED, "Identifier of block"),
-            new InputArgument(self::NAME_ARGUMENT, InputArgument::REQUIRED, "Name of migration"),
+            new InputArgument(self::VENDOR_ARGUMENT, InputArgument::REQUIRED, "Vendor"),
+            new InputArgument(self::NAME_ARGUMENT, InputArgument::REQUIRED, "Name"),
         ]);
         parent::configure();
     }
