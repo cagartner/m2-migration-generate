@@ -14,6 +14,8 @@ class Data extends AbstractHelper
 
     /**
      * Data constructor.
+     * @param WriterInterface $writer
+     * @param Context $context
      */
     public function __construct(
         WriterInterface $writer,

@@ -35,11 +35,13 @@ Every migration that you create will be generated into migrations folder in that
 
 ### Blocks:
     bin/magento make:migration:block {indentifier} {nameOfMigration}
-    # Exemplo
+    # Exemple
     bin/magento make:migration:block contact-us-info updateBlockInfo
 
 ### Pages
-@todo
+    bin/magento make:migration:page {indentifier} {nameOfMigration}
+    # Exemple
+    bin/magento make:migration:page home updateHomePage
 
 ### Emails Templates
 @todo

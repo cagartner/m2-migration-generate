@@ -8,7 +8,7 @@
 
 namespace Cagartner\GenerateMigration\Model;
 
-class GenerateBlock extends GenerateFile
+class GeneratePage extends GenerateFile
 {
     protected $block;
     protected $migrationName;
@@ -71,7 +71,7 @@ class GenerateBlock extends GenerateFile
             'migrationName' => $this->getMigrationName(),
         ];
 
-        $fileContent = $this->blade->render(self::TYPE_BLOCK, array_merge($fileData, $data));
+        $fileContent = $this->blade->render(self::TYPE_PAGE, array_merge($fileData, $data));
         $fileName = $this->getMigrationName() . '.php';
 
         $this->io->open(['path' => $this->getOutputDir()]);

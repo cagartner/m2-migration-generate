@@ -22,6 +22,8 @@
 namespace Cagartner\GenerateMigration\Console\Command;
 
 use Cagartner\GenerateMigration\Model\Config;
+use Cagartner\GenerateMigration\Model\GeneratePage;
+use Magento\Cms\Model\PageRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -31,8 +33,25 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Page extends Command
 {
 
-    const NAME_ARGUMENT = "name";
-    const NAME_OPTION = "option";
+    const NAME_ARGUMENT = 'name';
+    const IDENTIFIER_ARGUMENT = 'identifier';
+
+    protected $pageRepository;
+    protected $pageFile;
+
+    /**
+     * Page constructor.
+     */
+    public function __construct(
+        PageRepository $pageRepository,
+        GeneratePage $pageFile
+    )
+    {
+        $this->pageRepository = $pageRepository;
+        $this->pageFile = $pageFile;
+        parent::__construct();
+    }
+
 
     /**
      * {@inheritdoc}
@@ -42,8 +61,19 @@ class Page extends Command
         OutputInterface $output
     ) {
         $name = $input->getArgument(self::NAME_ARGUMENT);
-        $option = $input->getOption(self::NAME_OPTION);
-        $output->writeln("Hello " . $name);
+        $identifier = $input->getArgument(self::IDENTIFIER_ARGUMENT);
+
+        try {
+            /** @var \Magento\Cms\Model\Page $page */
+            $page = $this->pageRepository->getById($identifier);
+
+            $this->pageFile->setMigrationName($name);
+            $this->pageFile->generate(compact('page'));
+
+            $output->writeln("New page migration created in: " . $this->pageFile->getOutputDir() . 'Setup/migrations/' . $name . '.php');
+        } catch (\Exception $e) {
+            $output->writeln("Error in generate file: " . $e->getMessage());
+        }
     }
 
     /**
@@ -54,8 +84,8 @@ class Page extends Command
         $this->setName(Config::NAMESPACE . ":page");
         $this->setDescription("Generate Page Migration");
         $this->setDefinition([
-            new InputArgument(self::NAME_ARGUMENT, InputArgument::OPTIONAL, "Name"),
-            new InputOption(self::NAME_OPTION, "-a", InputOption::VALUE_NONE, "Option functionality")
+            new InputArgument(self::IDENTIFIER_ARGUMENT, InputArgument::REQUIRED, "Identifier of page"),
+            new InputArgument(self::NAME_ARGUMENT, InputArgument::REQUIRED, "Name of migration"),
         ]);
         parent::configure();
     }
