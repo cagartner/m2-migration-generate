@@ -29,9 +29,9 @@ class {{ $migrationName }}
     public function run()
     {
         /** @var \Magento\Cms\Model\Block $block */
-        $block = $this->blockRepository->getById({{ var_export($block->getIdentifier()) }});
-
-        if (!$block->getId()) {
+        try {
+            $block = $this->blockRepository->getById({{ var_export($block->getIdentifier()) }});
+        } catch (\Exception $e) {
             // If not exist, create a new block
             $block = $this->blockFactory->create();
             $block->setIdentifier({{ var_export($block->getIdentifier()) }});

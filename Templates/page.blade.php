@@ -28,11 +28,11 @@ class {{ $migrationName }}
 
     public function run()
     {
-        /** @var \Magento\Cms\Model\Page $block */
-        $page = $this->pageRepository->getById({{ var_export($page->getIdentifier()) }});
-
-        if (!$page->getId()) {
-            // If not exist, create a new block
+        /** @var \Magento\Cms\Model\Page $page */
+        try {
+            $page = $this->pageRepository->getById('new-home');
+        } catch (\Exception $e) {
+            // If not exist, create a new page
             $page = $this->pageFactory->create();
             $page->setIdentifier({{ var_export($page->getIdentifier()) }});
         }
