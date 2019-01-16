@@ -30,7 +30,7 @@ class {{ $migrationName }}
     {
         /** @var \Magento\Cms\Model\Page $page */
         try {
-            $page = $this->pageRepository->getById('new-home');
+            $page = $this->pageRepository->getById({{ var_export($page->getIdentifier()) }});
         } catch (\Exception $e) {
             // If not exist, create a new page
             $page = $this->pageFactory->create();

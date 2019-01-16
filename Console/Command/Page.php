@@ -32,7 +32,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Page extends Command
 {
-
     const NAME_ARGUMENT = 'name';
     const IDENTIFIER_ARGUMENT = 'identifier';
 

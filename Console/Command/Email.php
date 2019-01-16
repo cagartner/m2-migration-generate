@@ -22,6 +22,10 @@
 namespace Cagartner\GenerateMigration\Console\Command;
 
 use Cagartner\GenerateMigration\Model\Config;
+use Cagartner\GenerateMigration\Model\GenerateEmailTemplate;
+use Magento\Email\Model\Template;
+use Magento\Framework\App\Area;
+use Magento\Framework\App\State;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -30,9 +34,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Email extends Command
 {
+    const NAME_ARGUMENT = 'name';
+    const IDENTIFIER_ARGUMENT = 'identifier';
 
-    const NAME_ARGUMENT = "name";
-    const NAME_OPTION = "option";
+    protected $template;
+    protected $templateFile;
+    protected $state;
+
+    /**
+     * Email constructor.
+     * @param Template $template
+     * @param GenerateEmailTemplate $templateFile
+     * @param State $state
+     */
+    public function __construct(
+        Template $template,
+        GenerateEmailTemplate $templateFile,
+        State $state
+    )
+    {
+        $this->template = $template;
+        $this->templateFile = $templateFile;
+        $this->state = $state;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -41,9 +66,21 @@ class Email extends Command
         InputInterface $input,
         OutputInterface $output
     ) {
+        $this->state->setAreaCode(Area::AREA_FRONTEND);
+
         $name = $input->getArgument(self::NAME_ARGUMENT);
-        $option = $input->getOption(self::NAME_OPTION);
-        $output->writeln("Hello " . $name);
+        $identifier = $input->getArgument(self::IDENTIFIER_ARGUMENT);
+
+        try {
+            $template = $this->template->load($identifier);
+
+            $this->templateFile->setMigrationName($name);
+            $this->templateFile->generate(compact('template'));
+
+            $output->writeln("New email migration created in: " . $this->templateFile->getOutputDir() . 'Setup/migrations/' . $name . '.php');
+        } catch (\Exception $e) {
+            $output->writeln("Error in generate file: " . $e->getMessage());
+        }
     }
 
     /**
@@ -54,8 +91,8 @@ class Email extends Command
         $this->setName(Config::NAMESPACE . ":email");
         $this->setDescription("Generate E-mail Template Migration");
         $this->setDefinition([
-            new InputArgument(self::NAME_ARGUMENT, InputArgument::OPTIONAL, "Name"),
-            new InputOption(self::NAME_OPTION, "-a", InputOption::VALUE_NONE, "Option functionality")
+            new InputArgument(self::IDENTIFIER_ARGUMENT, InputArgument::REQUIRED, "Identifier of page"),
+            new InputArgument(self::NAME_ARGUMENT, InputArgument::REQUIRED, "Name of migration")
         ]);
         parent::configure();
     }
