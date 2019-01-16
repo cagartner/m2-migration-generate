@@ -1,4 +1,4 @@
-# Generate your CMS Blocks/Pages Migrations (WIP)
+# Generate your CMS Blocks/Pages Migrations (Beta)
 
 ## Installment
     composer require cagartner/module-generatemigration
