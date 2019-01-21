@@ -13,7 +13,7 @@ Copy your generated class and put in your migration module.
 Before create any migration your need to setup de migration module, for this run:
 
     bin/magento make:migration:init <Vendor> <NameofModule>
-    # Exemple
+    # Example
     bin/magento make:migration:init Cagartner Migration
 
 This command will create a new module in app/code folder of magento structure.
@@ -35,12 +35,12 @@ Every migration that you create will be generated into migrations folder in that
 
 ### Blocks:
     bin/magento make:migration:block {indentifier} {nameOfMigration}
-    # Exemple
+    # Example
     bin/magento make:migration:block contact-us-info updateBlockInfo
 
 ### Pages
     bin/magento make:migration:page {indentifier} {nameOfMigration}
-    # Exemple
+    # Example
     bin/magento make:migration:page home updateHomePage
 
 ### Emails Templates
